@@ -22,9 +22,8 @@ namespace Mediapipe {
       }
     }
 
-    public override OutputStreamPoller<T> ConsumeValueOrDie() {
-      EnsureOk();
-      UnsafeNativeMethods.mp_StatusOrPoller__ConsumeValueOrDie(mpPtr, out var pollerPtr).Assert();
+    public override OutputStreamPoller<T> Value() {
+      UnsafeNativeMethods.mp_StatusOrPoller__value(mpPtr, out var pollerPtr).Assert();
       Dispose();
 
       return new OutputStreamPoller<T>(pollerPtr);

@@ -21,9 +21,8 @@ namespace Mediapipe {
       }
     }
 
-    public override ImageFrame ConsumeValueOrDie() {
-      EnsureOk();
-      UnsafeNativeMethods.mp_StatusOrImageFrame__ConsumeValueOrDie(mpPtr, out var imageFramePtr).Assert();
+    public override ImageFrame Value() {
+      UnsafeNativeMethods.mp_StatusOrImageFrame__value(mpPtr, out var imageFramePtr).Assert();
       Dispose();
 
       return new ImageFrame(imageFramePtr);

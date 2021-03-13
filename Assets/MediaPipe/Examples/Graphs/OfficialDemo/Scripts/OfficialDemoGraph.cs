@@ -62,7 +62,7 @@ public class OfficialDemoGraph : DemoGraph {
   public override Status StartRun() {
 #if UNITY_IOS
     // On iOS, it's faster to get output packets synchronously than asynchronously.
-    outputStreamPoller = graph.AddOutputStreamPoller<ImageFrame>(outputStream).ConsumeValueOrDie();
+    outputStreamPoller = graph.AddOutputStreamPoller<ImageFrame>(outputStream).Value();
     outputPacket = new ImageFramePacket();
 #elif UNITY_EDITOR || !UNITY_ANDROID
     graph.ObserveOutputStream<ImageFramePacket, ImageFrame>(outputStream, OutputVideoCallback, out outputVideoCallbackHandle).AssertOk();
@@ -154,7 +154,7 @@ public class OfficialDemoGraph : DemoGraph {
           outputImage.Dispose();
         }
 
-        outputImage = statusOrImageFrame.ConsumeValueOrDie();
+        outputImage = statusOrImageFrame.Value();
       }
     } else {
       Debug.LogWarning(statusOrImageFrame.status.ToString());

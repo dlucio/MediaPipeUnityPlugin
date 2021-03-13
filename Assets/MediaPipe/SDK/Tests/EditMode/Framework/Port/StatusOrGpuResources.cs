@@ -29,25 +29,13 @@ namespace Tests {
     }
     #endregion
 
-    #region #ValueOrDie
+    #region #Value
     [Test, GpuOnly]
-    public void ValueOrDie_ShouldReturnGpuResources_When_StatusIsOk() {
+    public void Value_ShouldReturnGpuResources_When_StatusIsOk() {
       var statusOrGpuResources = GpuResources.Create();
       Assert.True(statusOrGpuResources.ok);
 
-      var gpuResources = statusOrGpuResources.ValueOrDie();
-      Assert.IsInstanceOf<GpuResources>(gpuResources);
-      Assert.False(statusOrGpuResources.isDisposed);
-    }
-    #endregion
-
-    #region #ConsumeValueOrDie
-    [Test, GpuOnly]
-    public void ConsumeValueOrDie_ShouldReturnGpuResources_When_StatusIsOk() {
-      var statusOrGpuResources = GpuResources.Create();
-      Assert.True(statusOrGpuResources.ok);
-
-      var gpuResources = statusOrGpuResources.ConsumeValueOrDie();
+      var gpuResources = statusOrGpuResources.Value();
       Assert.IsInstanceOf<GpuResources>(gpuResources);
       Assert.True(statusOrGpuResources.isDisposed);
     }

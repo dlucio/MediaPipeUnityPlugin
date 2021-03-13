@@ -7,20 +7,15 @@ namespace Mediapipe {
     public abstract bool ok { get; }
     public abstract Status status { get; }
 
-    /// <exception cref="InternalException">Thrown when status is not ok</exception>
-    public virtual T ValueOrDie() {
-      throw new NotSupportedException();
-    }
-
-    /// <exception cref="InternalException">Thrown when status is not ok</exception>
-    public virtual T ConsumeValueOrDie() {
-      throw new NotSupportedException();
-    }
-
-    protected void EnsureOk() {
+    public virtual T ValueOr(T defaultValue) {
       if (!ok) {
-        throw new InternalException($"Status is not ok: {status.ToString()}");
+        return defaultValue;
       }
+
+      return Value();
     }
+
+    /// <exception cref="MediaPipePluginException">Thrown when status is not ok</exception>
+    public abstract T Value();
   }
 }
