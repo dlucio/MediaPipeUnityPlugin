@@ -11,15 +11,19 @@ workspace(name = "mediapipe_api")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-skylib_version = "0.9.0"
 http_archive(
     name = "bazel_skylib",
     type = "tar.gz",
-    url = "https://github.com/bazelbuild/bazel-skylib/releases/download/{}/bazel_skylib-{}.tar.gz".format (skylib_version, skylib_version),
-    sha256 = "1dde365491125a3db70731e25658dfdd3bc5dbdfd11b840b3e987ecf043c7ca0",
+    urls = [
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.0.3/bazel-skylib-1.0.3.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.0.3/bazel-skylib-1.0.3.tar.gz",
+    ],
+    sha256 = "1c531376ac7e5a180e0237938a2536de0c54d93f5c278634818e0efc952dd56c",
 )
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+bazel_skylib_workspace()
 load("@bazel_skylib//lib:versions.bzl", "versions")
-versions.check(minimum_bazel_version = "3.4.0")
+versions.check(minimum_bazel_version = "3.7.2")
 
 http_archive(
     name = "rules_pkg",
@@ -32,25 +36,26 @@ rules_pkg_dependencies()
 new_local_repository(
     name = "unity",
     build_file = "@//third_party:unity.BUILD",
-    path = "/path/to/unity/2019.4.23f1",
+    path = "/path/to/unity/2020.3.8f1",
 )
 
 # mediapipe
 http_archive(
-  name = "com_google_mediapipe",
-  sha256 = "95b097a014cb329213fa647efafba286bac75126a964dda08f62cbaf95aba42d",
-  strip_prefix = "mediapipe-0.8.3.1",
-  patches = [
-      "@//third_party:mediapipe_android.diff",
-      "@//third_party:mediapipe_ios.diff",
-      "@//third_party:mediapipe_visibility.diff",
-      "@//third_party:mediapipe_model_path.diff",
-      "@//third_party:mediapipe_extension.diff",
-  ],
-  patch_args = [
-      "-p1",
-  ],
-  urls = ["https://github.com/google/mediapipe/archive/0.8.3.1.tar.gz"],
+    name = "com_google_mediapipe",
+    strip_prefix = "mediapipe-0.8.4",
+    sha256 = "b44f8d19c6236ae46d7445a477739f24a221326a5cf55ca011350967e5981560",
+    patches = [
+        "@//third_party:mediapipe_opencv.diff",
+        "@//third_party:mediapipe_android.diff",
+        "@//third_party:mediapipe_ios.diff",
+        "@//third_party:mediapipe_visibility.diff",
+        "@//third_party:mediapipe_model_path.diff",
+        "@//third_party:mediapipe_extension.diff",
+    ],
+    patch_args = [
+        "-p1",
+    ],
+    urls = ["https://github.com/google/mediapipe/archive/v0.8.4.tar.gz"],
 )
 
 # ABSL cpp library lts_2020_09_23
@@ -78,16 +83,14 @@ http_archive(
 
 http_archive(
    name = "rules_foreign_cc",
-   strip_prefix = "rules_foreign_cc-main",
-   url = "https://github.com/bazelbuild/rules_foreign_cc/archive/main.zip",
+   strip_prefix = "rules_foreign_cc-0.2.0",
+   sha256 = "e60cfd0a8426fa4f5fd2156e768493ca62b87d125cb35e94c44e79a3f0d8635f",
+   url = "https://github.com/bazelbuild/rules_foreign_cc/archive/0.2.0.zip",
 )
 
-load("@rules_foreign_cc//:workspace_definitions.bzl", "rules_foreign_cc_dependencies")
+load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
 
 rules_foreign_cc_dependencies()
-
-# This is used to select all contents of the archives for CMake-based packages to give CMake access to them.
-all_content = """filegroup(name = "all", srcs = glob(["**"]), visibility = ["//visibility:public"])"""
 
 # GoogleTest/GoogleMock framework. Used by most unit-tests.
 # Last updated 2020-06-30.
@@ -157,7 +160,8 @@ http_archive(
 # libyuv
 http_archive(
     name = "libyuv",
-    urls = ["https://chromium.googlesource.com/libyuv/libyuv/+archive/refs/heads/master.tar.gz"],
+    # Error: operand type mismatch for `vbroadcastss' caused by commit 8a13626e42f7fdcf3a6acbb0316760ee54cda7d8.
+    urls = ["https://chromium.googlesource.com/libyuv/libyuv/+archive/2525698acba9bf9b701ba6b4d9584291a1f62257.tar.gz"],
     build_file = "@com_google_mediapipe//third_party:libyuv.BUILD",
 )
 
@@ -223,7 +227,8 @@ http_archive(
 
 http_archive(
     name = "opencv",
-    build_file_content = all_content,
+    build_file = "@//third_party:opencv.BUILD",
+    sha256 = "1ed6f5b02a7baf14daca04817566e7c98ec668cec381e0edf534fa49f10f58a2",
     strip_prefix = "opencv-3.4.10",
     urls = ["https://github.com/opencv/opencv/archive/3.4.10.tar.gz"],
 )
@@ -236,7 +241,7 @@ new_local_repository(
 
 new_local_repository(
     name = "linux_ffmpeg",
-    build_file = "@com_google_mediapipe//third_party:ffmpeg_linux.BUILD",
+    build_file = "@//third_party:ffmpeg_linux.BUILD",
     path = "/usr"
 )
 
@@ -248,7 +253,7 @@ new_local_repository(
 
 new_local_repository(
     name = "macos_ffmpeg",
-    build_file = "@com_google_mediapipe//third_party:ffmpeg_macos.BUILD",
+    build_file = "@//third_party:ffmpeg_macos.BUILD",
     path = "/usr/local/opt/ffmpeg",
 )
 
@@ -345,8 +350,8 @@ http_archive(
 
 # Maven dependencies.
 
-RULES_JVM_EXTERNAL_TAG = "3.2"
-RULES_JVM_EXTERNAL_SHA = "82262ff4223c5fda6fb7ff8bd63db8131b51b413d26eb49e3131037e79e324af"
+RULES_JVM_EXTERNAL_TAG = "4.0"
+RULES_JVM_EXTERNAL_SHA = "31701ad93dbfe544d597dbe62c9a1fdd76d81d8a9150c2bf1ecf928ecdf97169"
 
 http_archive(
     name = "rules_jvm_external",
@@ -359,7 +364,6 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 # Important: there can only be one maven_install rule. Add new maven deps here.
 maven_install(
-    name = "maven",
     artifacts = [
         "androidx.concurrent:concurrent-futures:1.0.0-alpha03",
         "androidx.lifecycle:lifecycle-common:2.2.0",
@@ -375,6 +379,8 @@ maven_install(
         "androidx.test.espresso:espresso-core:3.1.1",
         "com.github.bumptech.glide:glide:4.11.0",
         "com.google.android.material:material:aar:1.0.0-rc01",
+        "com.google.auto.value:auto-value:1.6.4",
+        "com.google.auto.value:auto-value-annotations:1.6.4",
         "com.google.code.findbugs:jsr305:3.0.2",
         "com.google.flogger:flogger-system-backend:0.3.1",
         "com.google.flogger:flogger:0.3.1",
@@ -384,10 +390,10 @@ maven_install(
         "org.hamcrest:hamcrest-library:1.3",
     ],
     repositories = [
-        "https://jcenter.bintray.com",
         "https://maven.google.com",
         "https://dl.google.com/dl/android/maven2",
         "https://repo1.maven.org/maven2",
+        "https://jcenter.bintray.com",
     ],
     fetch_sources = True,
     version_conflict_policy = "pinned",
@@ -404,10 +410,10 @@ http_archive(
     ],
 )
 
-#Tensorflow repo should always go after the other external dependencies.
-# 2020-12-09
-_TENSORFLOW_GIT_COMMIT = "0eadbb13cef1226b1bae17c941f7870734d97f8a"
-_TENSORFLOW_SHA256= "4ae06daa5b09c62f31b7bc1f781fd59053f286dd64355830d8c2ac601b795ef0"
+# Tensorflow repo should always go after the other external dependencies.
+# 2021-04-30
+_TENSORFLOW_GIT_COMMIT = "5bd3c57ef184543d22e34e36cff9d9bea608e06d"
+_TENSORFLOW_SHA256= "9a45862834221aafacf6fb275f92b3876bc89443cbecc51be93f13839a6609f0"
 http_archive(
     name = "org_tensorflow",
     urls = [
@@ -424,5 +430,7 @@ http_archive(
     sha256 = _TENSORFLOW_SHA256,
 )
 
-load("@org_tensorflow//tensorflow:workspace.bzl", "tf_workspace")
-tf_workspace(tf_repo_name = "org_tensorflow")
+load("@org_tensorflow//tensorflow:workspace3.bzl", "tf_workspace3")
+tf_workspace3()
+load("@org_tensorflow//tensorflow:workspace2.bzl", "tf_workspace2")
+tf_workspace2()

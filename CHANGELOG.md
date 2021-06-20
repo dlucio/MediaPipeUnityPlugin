@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.0](https://github.com/homuler/MediaPipeUnityPlugin/compare/v0.5.3...v0.6.0) (2021-05-15)
+
+
+### Features
+
+* read .binarypb ([3ca8642](https://github.com/homuler/MediaPipeUnityPlugin/commit/3ca8642ab57b7f067276da1c67ff8112b9f89c10))
+* **sdk:** implement FaceGeometryPacket ([473c3a0](https://github.com/homuler/MediaPipeUnityPlugin/commit/473c3a0fa1de9f2ea0ab982936fa947d102f7ab4))
+
+
+### Bug Fixes
+
+* return type is wrong ([4ca0f5f](https://github.com/homuler/MediaPipeUnityPlugin/commit/4ca0f5f289b06e610c88cee744d1da50fb270356))
+
+### [0.5.3](https://github.com/homuler/MediaPipeUnityPlugin/compare/v0.5.2...v0.5.3) (2021-04-30)
+
+
+### Bug Fixes
+
+* **docker:** zip command is not installed ([aa8e1bd](https://github.com/homuler/MediaPipeUnityPlugin/commit/aa8e1bd1fc97046c6fbb0ed21646d0e1eb3811d8))
+
+### [0.5.2](https://github.com/homuler/MediaPipeUnityPlugin/compare/v0.5.1...v0.5.2) (2021-04-30)
+
+
+### Bug Fixes
+
+* copytree fails on Windows (Docker) ([fd0e83c](https://github.com/homuler/MediaPipeUnityPlugin/commit/fd0e83cdf561b22e09162363a5310bbbd0d04cd6))
+* fail to build mediapipe_android.aar ([24fe5db](https://github.com/homuler/MediaPipeUnityPlugin/commit/24fe5dbfed6e5a9bc40821898542d3c6906ea11f))
+* modify bsdtar command typo "s" ([#120](https://github.com/homuler/MediaPipeUnityPlugin/issues/120)) ([33c0bd3](https://github.com/homuler/MediaPipeUnityPlugin/commit/33c0bd375b623d47c918cdb4c7d22ad87253013b))
+* nuget fails on Ubuntu or Debian ([e00e4ae](https://github.com/homuler/MediaPipeUnityPlugin/commit/e00e4ae8d35af780e5ff8fa38b09efbea433b473))
+* rules_foreign_cc version must be 0.1.0 ([780d405](https://github.com/homuler/MediaPipeUnityPlugin/commit/780d405da003f472f2b8e14fdd9c71ef21c616f6))
+* wildcard is not expanded ([dd99867](https://github.com/homuler/MediaPipeUnityPlugin/commit/dd9986746cb746e06cc7a4ec846f59eaa3cc3990))
+* **example:** failed to compile when the target is Android ([92cad4b](https://github.com/homuler/MediaPipeUnityPlugin/commit/92cad4bbe9ba52514034c52ac5b5f0a99accab06))
+
 ### [0.5.1](https://github.com/homuler/MediaPipeUnityPlugin/compare/v0.5.0...v0.5.1) (2021-03-21)
 
 

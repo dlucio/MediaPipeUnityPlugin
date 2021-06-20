@@ -1,5 +1,5 @@
 # MediaPipe Unity Plugin
-This is a Unity (2019.4.23f1) Plugin to use MediaPipe (0.8.3.1).
+This is a Unity (2020.3.8f1) Plugin to use MediaPipe (0.8.3.1).
 
 ## Prerequisites
 To use this plugin, you need to build native libraries for the target platforms (Desktop/UnityEditor, Android, iOS).
@@ -31,7 +31,7 @@ Hair Segmentation       | ✅       |     | ✅           |             |       
 Object Detection        | ✅       | ✅   | ✅           | ✅           | ✅     | ✅
 Box Tracking            | ✅       | ✅   | ✅           | ✅           | ✅     | 🔺*1
 Instant Motion Tracking | ✅       | 🔺   | ✅           |             |       |
-Objectron               |         |     | ✅           |             |       |
+Objectron               | ✅       | 🔺   | ✅           |             |       |
 KNIFT                   |         |     |             |             |       |
 
 *1: crashes sometimes when the graph exits.
@@ -58,7 +58,10 @@ Also note that you need to build native libraries for Desktop CPU or GPU to run 
     #
     # In that case, apply a patch.
     #
-    #   git apply docker/linux/x86_64/pacman.patch
+    #   git apply docker/linux/x86_64/glibc.patch
+
+    # You can specify MIRROR_COUNTRY to increase download speed
+    docker build --build-arg RANKMIRROS=true --build-arg MIRROR_COUNTRY=FR,GB -t mediapipe_unity:latest . -f docker/linux/x86_64/Dockerfile
     ```
 
 1. Run a Docker container
@@ -71,21 +74,20 @@ Also note that you need to build native libraries for Desktop CPU or GPU to run 
 1. Run [build command](#build-command) inside the container
     ```sh
     # Build native libraries for Desktop CPU.
-    # Note that you need to specify `--include_opencv_libs` if OpenCV 3 is not installed to your host machine.
-    python build.py build --desktop cpu --include_opencv_libs -v
+    # Note that you need to specify `--opencv=cmake`, because OpenCV is not installed to the container.
+    python build.py build --desktop cpu --opencv=cmake -v
 
     # Build native libraries for Desktop GPU and Android
-    python build.py build --desktop gpu --android arm64 --include_opencv_libs -v
+    python build.py build --desktop gpu --android arm64 --opencv=cmake -v
     ```
 
 If the command finishes successfully, required files will be installed to your host machine.
 
 ### Linux
-1. Install OpenCV
+1. Install OpenCV and FFmpeg (optional)
 
     By default, it is assumed that OpenCV 3 is installed under `/usr` (e.g. `/usr/lib/libopencv_core.so`).\
     If your version or path is different, please edit [third_party/opencv_linux.BUILD](https://github.com/homuler/MediaPipeUnityPlugin/blob/master/third_party/opencv_linux.BUILD) and [WORKSPACE](https://github.com/homuler/MediaPipeUnityPlugin/blob/master/WORKSPACE).
-
 
     For example, if you use ArchLinux and [opencv3-opt](https://aur.archlinux.org/packages/opencv3-opt/), OpenCV 3 is installed under `/opt/opencv3`.\
     In this case, your `WORKSPACE` will look like this.
@@ -205,13 +207,16 @@ If the command finishes successfully, required files will be installed to your h
 
 ### Windows
 #### Desktop/UnityEditor
+1. Follow [mediapipe's installation guide](https://google.github.io/mediapipe/getting_started/install.html#installing-on-windows) and
+    install MSYS2, Python, Visual C++ Build Tools 2019, WinSDK and Bazel (step1 ~ step6).
+
 1. Install Opencv
 
     By default, it is assumed that OpenCV 3.4.10 is installed under `C:\opencv`.\
     If your version or path is different, please edit [third_party/opencv_windows.BUILD](https://github.com/homuler/MediaPipeUnityPlugin/blob/master/third_party/opencv_windows.BUILD) and [WORKSPACE](https://github.com/homuler/MediaPipeUnityPlugin/blob/master/WORKSPACE).
 
 
-1. Install Bazelisk and NuGet, and ensure you can run them
+1. Install NuGet, and ensure you can run them
     ```sh
     bazel --version
     nuget
@@ -231,16 +236,19 @@ If the command finishes successfully, required files will be installed to your h
     In that case, install python to another directory as a workaround (it's unnecessary to set the path to `%PATH%`, but don't forget to install numpy for the new Python).
 
 1. Run [build command](#build-command)
+    ```bat
+    python build.py build --desktop cpu --include_opencv_libs -v
+    ```
+
 
 #### Android
-You cannot build native libraries for Android on Windows 10, so use WSL 2 instead.\
-Installation steps are the same as [Linux](#Linux).
+You cannot build native libraries for Android on Windows 10, so use [Docker for Windows](https://github.com/homuler/MediaPipeUnityPlugin#android) instead.
 
 
 ### macOS
 1. Install [Homebrew](https://brew.sh)
 
-1. Install OpenCV 3
+1. Install OpenCV 3 and FFmpeg (optional)
     ```sh
     brew install opencv@3
     brew uninstall --ignore-dependencies glog
@@ -282,17 +290,21 @@ Installation steps are the same as [Linux](#Linux).
 ```sh
 # Required files (native libraries, model files, C# scripts) will be built and installed.
 
-# e.g. Desktop GPU only
+# Build for Desktop with GPU enabled.
 python build.py build --desktop gpu -v
 
-# e.g. Include OpenCV libs to `Packages` (for Desktop)
-python build.py build --desktop gpu --include_opencv_libs -v
+# If you've not installed OpenCV locally, you need to build OpenCV from sources for Desktop.
+python build.py build --desktop gpu --opencv=cmake -v
 
-# e.g. Desktop CPU and Android
-python build.py build --desktop cpu --android arm64 -v
+# If FFmpeg is installed, you can build OpenCV with FFmpeg.
+python build.py build --desktop gpu --opencv=cmake --opencv_deps=ffmpeg -v
 
-# e.g. iOS
-python build.py build --ios arm64 -v
+# Build for Desktop with GPU disabled, and copy OpenCV shared libraries to `Packages`.
+# If you use Windows 10, you would run this command.
+python build.py build --desktop cpu --include_opencv_libs -v
+
+# Build for Desktop, Android, and iOS
+python build.py build --desktop cpu --android arm64 --ios arm64 -v
 ```
 
 Run `python build.py --help` and `python build.py build --help` for more details.
